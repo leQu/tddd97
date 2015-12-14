@@ -116,7 +116,7 @@ var serverstub = (function() {
         persistLoggedInUsers();
         return {"success": true, "message": "Successfully signed out."};
       } else {
-        return {"success": false, "message": "You are not signed in."};
+        return {"success": false, "message": "You are not signed out."};
       }
     },
 

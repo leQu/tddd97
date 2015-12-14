@@ -12,7 +12,7 @@
     <div id="logo-slogan"><img src="wimage.png"></div>
 
     <div id="login">
-        <form>
+        <form name="signInForm" method="post" onsubmit="return signIn()">
             <br>
             <label>Email</label><input type="text" name="email"><br>
             <label>Password</label><input type="password" name="password"><br>
@@ -43,7 +43,10 @@
 </script>
 
 
-<script type=”text/view” id="profileView">ProfileView</script>
+<script type=”text/view” id="profileView">
+ProfileView
+<button type="button" onclick="signOutUser()">Log out</button>
+</script>
 
 
 </head>

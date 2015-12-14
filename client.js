@@ -4,7 +4,12 @@ displayView = function(viewId){
 }
 
 window.onload = function(){
-    displayView("welcomeView");
+    var token = localStorage.getItem("token");
+    if (token === 'undefined' || token === null ){
+        displayView("welcomeView");
+    }
+    else displayView("profileView");
+    console.log(localStorage.getItem("token"));
 }
 
 function signUp() {
@@ -12,14 +17,34 @@ function signUp() {
     // Create data object
     var dataObject = signUpFormToDataObject();
 
-    var respons = serverstub.signUp(dataObject);
+    var response = serverstub.signUp(dataObject);
     // Successful signup
-    if (respons.success){
-        alert(respons.message);
+    if (response.success){
+        alert(response.message);
     }
-    else alert(respons.message);
-
+    else alert(response.message);
 }
+
+function signIn(){
+    var username = document.forms["signInForm"]["email"].value;
+    var password = document.forms["signInForm"]["password"].value;
+
+    var response = serverstub.signIn(username, password);
+    if (response.success){
+        localStorage.setItem("token", response.data);
+        displayView("profileView");
+    }
+    else alert(response.message);
+}
+
+function signOutUser(){
+    var response = serverstub.signOut(localStorage.getItem("token"));
+    if (response.success){
+        localStorage.removeItem("token");
+        displayView("welcomeView");
+    }
+}
+
 
 function signUpFormToDataObject(){
     var dataObject = new Object();
