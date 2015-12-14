@@ -22,20 +22,20 @@
 
     <div id="signup">
         <h2>Sign up</h2>
-        <form name="signUpForm" onsubmit="return validateSignUpForm()">
+        <form name="signUpForm" method="post" onsubmit="return signUp()">
             <br>
-            Email<input type="email"required><br>
+            Email<input name="email" type="email"required><br>
             Password<input type="password" name="password1" required><br>
             Repeat password<input type="password"  name="password2" required><br>
-            First Name<input type="text" required><br>
-            Family Name<input type="text" required><br>
+            First Name<input type="text" name="firstname" required><br>
+            Family Name<input type="text" name="familyname" required><br>
             Gender
-            <select>
+            <select name="gender">
                 <option>Male</option>
                 <option>Female</option>
             </select><br>
-            City<input type="text" required><br>
-            Country<input type="text" required><br>
+            City<input type="text" name="city" required><br>
+            Country<input type="text" name="country" required><br>
             <input type="submit" value="Sign up">
         </form>
     </div>
