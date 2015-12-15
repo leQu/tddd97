@@ -50,14 +50,20 @@
         <div id="logo-slogan">
 
             <ul id="menu">
-            <li onclick="displayTab('home')">Home</li>
-            <li onclick="displayTab('browse')">Browse</li>
-            <li onclick="displayTab('account')">Account</li>
-            <li onclick="signOutUser()">Log out</li>
+                <li onclick="displayTab('home')">Home</li>
+                <li onclick="displayTab('browse')">Browse</li>
+                <li onclick="displayTab('account')">Account</li>
+                <li onclick="signOutUser()">Log out</li>
             </ul>
 
-        <div id="home">Home</div>
+        <div id="home">
+        <h2>User Info</h2>
+
+
+
+        </div>
         <div id="browse">Browse</div>
+
         <div id="account">
             <h2>Change password</h2>
             <form name="changePasswordForm" method="post" onsubmit="return changePassword()">
@@ -69,8 +75,6 @@
         </div>
 
         </div>
-        <div id="login"></div>
-        <div id="signup"></div>
     </div>
 
 

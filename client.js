@@ -1,6 +1,7 @@
 displayView = function(viewId){
     var view = document.getElementById(viewId).innerHTML;
     document.getElementById("content").innerHTML = view;
+    if(viewId === "profileView") displayTab('home');
 }
 
 window.onload = function(){
@@ -9,7 +10,6 @@ window.onload = function(){
         displayView("welcomeView");
     }
     else displayView("profileView");
-    console.log(localStorage.getItem("token"));
 }
 
 function displayTab(tabId){
@@ -17,6 +17,38 @@ function displayTab(tabId){
     document.getElementById("browse").style.display = "none";
     document.getElementById("account").style.display = "none";
     document.getElementById(tabId).style.display = "block";
+
+    if (tabId === "home"){
+        var token = localStorage.getItem("token");
+        var user = serverstub.getUserDataByToken(token);
+        var messages = serverstub.getUserMessagesByToken(token)
+        var homeDiv = document.getElementById("home");
+
+        homeDiv.innerHTML = getUserString(user.data);
+        homeDiv.innerHTML += "<hr>";
+        homeDiv.innerHTML += "<h2>Wall</h2>";
+        homeDiv.innerHTML += getMessagesString(messages);
+        console.log(messages);
+    }
+}
+
+function getMessagesString(messages){
+    var string = "";
+    for (var i=0;i<messages.data.length; i++){
+        string += messages.data[i].writer + ":<br>";
+        string += messages.data[i].content + "<br><br>";
+    }
+    return string;
+}
+
+function getUserString(user){
+    return "" +
+        user.firstname + "<br>" +
+        user.familyname + "<br>" +
+        user.gender + "<br>" +
+        user.city + "<br>" +
+        user.country + "<br>" +
+        user.email;
 }
 
 function signUp() {
