@@ -52,6 +52,12 @@ function signOutUser(){
     }
 }
 
+function changePassword(){
+    var newPassword = document.forms["changePasswordForm"]["newPassword"].value;
+    var oldPassword = document.forms["changePasswordForm"]["oldPassword"].value;
+    serverstub.changePassword(localStorage.getItem("token"),oldPassword,newPassword);
+}
+
 
 function signUpFormToDataObject(){
     var dataObject = new Object();
