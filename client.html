@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link href="client.css" type="text/css" rel="stylesheet">
+    <link href="menu.css" type="text/css" rel="stylesheet">
     <script src="client.js"></script>
     <script src="serverstub.js"></script>
 
@@ -43,9 +44,28 @@
 </script>
 
 
-<script type=”text/view” id="profileView">
-ProfileView
-<button type="button" onclick="signOutUser()">Log out</button>
+    <script type=”text/view” id="profileView">
+    <div id="main">
+
+        <div id="logo-slogan">
+
+            <ul id="menu">
+            <li onclick="displayTab('home')">Home</li>
+            <li onclick="displayTab('browse')">Browse</li>
+            <li onclick="displayTab('account')">Account</li>
+            <li onclick="signOutUser()">Log out</li>
+            </ul>
+
+        <div id="home">Home</div>
+        <div id="browse">Browse</div>
+        <div id="account">Account</div>
+
+        </div>
+        <div id="login"></div>
+        <div id="signup"></div>
+    </div>
+
+
 </script>
 
 

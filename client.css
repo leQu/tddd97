@@ -45,3 +45,7 @@ margin:2px;
 
 float:left;
 }
+
+#account, #browse{
+    display: none;
+}

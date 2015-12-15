@@ -1,0 +1,10 @@
+ul#menu li {
+    display:inline;
+    background-color: aliceblue;
+    padding: 10px;
+}
+
+ul#menu li:hover{
+    background-color: cadetblue;
+    cursor: pointer;
+}

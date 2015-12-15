@@ -12,6 +12,13 @@ window.onload = function(){
     console.log(localStorage.getItem("token"));
 }
 
+function displayTab(tabId){
+    document.getElementById("home").style.display = "none";
+    document.getElementById("browse").style.display = "none";
+    document.getElementById("account").style.display = "none";
+    document.getElementById(tabId).style.display = "block";
+}
+
 function signUp() {
     if (!isSignUpFormValid()) return false;
     // Create data object
