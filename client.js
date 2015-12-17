@@ -19,16 +19,8 @@ function displayTab(tabId){
     document.getElementById(tabId).style.display = "block";
 
     if (tabId === "home"){
-        var token = localStorage.getItem("token");
-        var user = serverstub.getUserDataByToken(token);
-        var messages = serverstub.getUserMessagesByToken(token)
-        var homeDiv = document.getElementById("home");
-
-        homeDiv.innerHTML = getUserString(user.data);
-        homeDiv.innerHTML += "<hr>";
-        homeDiv.innerHTML += "<h2>Wall</h2>";
-        homeDiv.innerHTML += getMessagesString(messages);
-        console.log(messages);
+        updateUserInfo();
+        updateWall();
     }
 }
 
@@ -49,6 +41,28 @@ function getUserString(user){
         user.city + "<br>" +
         user.country + "<br>" +
         user.email;
+}
+
+function sendMessage(){
+    var message = document.forms["wallForm"]["message"].value;
+    var token = localStorage.getItem("token");
+    var email = serverstub.getUserDataByToken(token).email;
+    serverstub.postMessage(token,message,email);
+}
+
+function updateUserInfo(){
+        var token = localStorage.getItem("token");
+        var user = serverstub.getUserDataByToken(token);
+        var userInfoDiv = document.getElementById("userInfo");
+        userInfoDiv.innerHTML = getUserString(user.data);
+}
+
+function updateWall(){
+    var token = localStorage.getItem("token");
+    var messages = serverstub.getUserMessagesByToken(token)
+    var wallDiv = document.getElementById("wall");
+
+    wallDiv.innerHTML += getMessagesString(messages);
 }
 
 function signUp() {

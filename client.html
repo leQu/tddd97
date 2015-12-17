@@ -7,8 +7,9 @@
     <script src="client.js"></script>
     <script src="serverstub.js"></script>
 
-    <script type=”text/view” id="welcomeView">
 
+    <!---------------- Welcome view ----------------------->
+    <script type=”text/view” id="welcomeView">
 <div id="main">
     <div id="logo-slogan"><img src="wimage.png"></div>
 
@@ -43,11 +44,11 @@
 </div>
 </script>
 
-
+    <!---------------- Profile view ----------------------->
     <script type=”text/view” id="profileView">
     <div id="main">
 
-        <div id="logo-slogan">
+        <div id="profileDiv">
 
             <ul id="menu">
                 <li onclick="displayTab('home')">Home</li>
@@ -57,24 +58,33 @@
             </ul>
 
         <div id="home">
-        <h2>User Info</h2>
-
-
-
+            <div id="userInfo">
+                <h2>User Info</h2>
+            </div>
+            <hr>
+            <div id="wall">
+                <h2>Wall</h2>
+                <form name="wallForm" method="post" onsubmit="return sendMessage()">
+                    <input type="text" name="message">
+                    <input type="submit" value="Send">
+                   </form>
+                   <button onclick="updateWall()">Update</button><br>
+                </div>
         </div>
         <div id="browse">Browse</div>
 
         <div id="account">
             <h2>Change password</h2>
             <form name="changePasswordForm" method="post" onsubmit="return changePassword()">
-            Old Password<input type="password" name="oldPassword" required><br>
-            New password<input type="password"  name="newPassword" required><br>
-            <input type="submit" value="Change password">
-        </form>
+                Old Password<input type="password" name="oldPassword" required><br>
+                New password<input type="password"  name="newPassword" required><br>
+                <input type="submit" value="Change password">
+            </form>
 
         </div>
 
-        </div>
+      </div>
+
     </div>
 
 

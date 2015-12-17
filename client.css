@@ -16,7 +16,7 @@ height: 400px;
 width: 250px;
 }
 
-form{
+#login form, #signup form{
 text-align:right;
 margin: 0 5px;
 }
@@ -38,14 +38,17 @@ height: 100px;
 height: 290px;
 }
 
-#login, #signup, #logo-slogan{
+#login, #signup, #logo-slogan, #profileDiv{
 background-color: white;
 border: 3px solid black;
 margin:2px;
-
 float:left;
 }
 
 #account, #browse{
     display: none;
+}
+
+#wall form {
+    display:inline;
 }
