@@ -1,9 +1,3 @@
-displayView = function(viewId){
-    var view = document.getElementById(viewId).innerHTML;
-    document.getElementById("content").innerHTML = view;
-    if(viewId === "profileView") displayTab('home');
-}
-
 window.onload = function(){
     var token = localStorage.getItem("token");
     if (token === 'undefined' || token === null ){
@@ -12,15 +6,28 @@ window.onload = function(){
     else displayView("profileView");
 }
 
-function displayTab(tabId){
+function displayView(viewId){
+    var view = document.getElementById(viewId).innerHTML;
+    document.getElementById("content").innerHTML = view;
+
+    if(viewId === "profileView"){
+        displayTab("home");
+    }
+}
+
+function displayTab(tabId, email){
     document.getElementById("home").style.display = "none";
     document.getElementById("browse").style.display = "none";
     document.getElementById("account").style.display = "none";
     document.getElementById(tabId).style.display = "block";
 
-    if (tabId === "home"){
-        updateUserInfo();
-        updateWall();
+    if (tabId === "home") {
+        if (typeof email === 'undefined'){
+            var token = localStorage.getItem("token");
+            email = serverstub.getUserDataByToken(token).data.email;
+        }
+        updateUserInfo(email);
+        updateWall(email);
     }
 }
 
@@ -43,26 +50,33 @@ function getUserString(user){
         user.email;
 }
 
-function sendMessage(){
+function sendMessage(toEmail){
     var message = document.forms["wallForm"]["message"].value;
     var token = localStorage.getItem("token");
-    var email = serverstub.getUserDataByToken(token).email;
-    serverstub.postMessage(token,message,email);
+    serverstub.postMessage(token,message,toEmail);
+    updateWall(toEmail);
 }
 
-function updateUserInfo(){
-        var token = localStorage.getItem("token");
-        var user = serverstub.getUserDataByToken(token);
-        var userInfoDiv = document.getElementById("userInfo");
-        userInfoDiv.innerHTML = getUserString(user.data);
-}
-
-function updateWall(){
+function updateUserInfo(email){
     var token = localStorage.getItem("token");
-    var messages = serverstub.getUserMessagesByToken(token)
-    var wallDiv = document.getElementById("wall");
+    var user = serverstub.getUserDataByEmail(token,email);
+    var userInfoDiv = document.getElementById("userInfo");
+    userInfoDiv.innerHTML = getUserString(user.data);
+}
 
-    wallDiv.innerHTML += getMessagesString(messages);
+function updateWall(email){
+    var token = localStorage.getItem("token");
+    var messages = serverstub.getUserMessagesByEmail(token,email);
+    var messagesDiv  = document.getElementById("messages");
+    messagesDiv.innerHTML = getMessagesString(messages);
+    console.log(messages);
+    // This classname keeps track of whose wall we are watching.
+    document.getElementById("wall").className = email;
+}
+
+function browseUser(){
+    var email = document.forms["browseForm"]["userEmail"].value;
+    displayTab("home", email);
 }
 
 function signUp() {
@@ -127,10 +141,7 @@ function signUp() {
     if (!isSignUpFormValid()) return false;
     // Create data object
     var dataObject = signUpFormToDataObject();
-
     var respons = serverstub.signUp(dataObject);
-    console.log(dataObject.country);
-    console.log(respons);
     // Successful signup
     if (respons.success){
         alert(respons.message);
