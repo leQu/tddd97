@@ -1,7 +1,7 @@
 # all the imports
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, \
-     abort, render_template, flash
+    abort, render_template, flash
 from contextlib import closing
 
 # configuration
@@ -29,11 +29,43 @@ def init_db():
         db.commit()
 
 
-@app.route('/')
+@app.route('/old')
 def show_entries():
     cur = g.db.execute('select title, text from entries order by id desc')
     entries = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
     return render_template('show_entries.html', entries=entries)
+
+
+@app.route('/')
+def show_users():
+    cur = g.db.execute('select email, firstname, familyname, gender, city, country '
+                       'from users order by id desc')
+    users = [dict(
+            email=row[0],
+            firstname=row[1],
+            familyname=row[2],
+            gender=row[3],
+            city=row[4],
+            country=row[5]
+    ) for row in cur.fetchall()]
+    return render_template('show_users.html', users=users)
+
+
+@app.route('/signup', methods=['POST'])
+def add_user():
+    email = request.form['email']
+    password = request.form['password1']
+    firstname = request.form['firstname']
+    familyname = request.form['familyname']
+    gender = request.form['gender']
+    city = request.form['city']
+    country = request.form['country']
+    g.db.execute('insert into users (email, password, firstname, familyname, gender, city, country)'
+                 'values (?, ?, ?, ?, ?, ?, ?)',
+                 [email, password, firstname, familyname, gender, city, country])
+    g.db.commit()
+    flash('A new user was created successfully')
+    return redirect(url_for('show_users'))
 
 
 @app.route('/add', methods=['POST'])
