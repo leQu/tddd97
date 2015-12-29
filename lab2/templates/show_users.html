@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-{% if session.logged_in %}
+{% if not logged_in_users[session.token] %}
 <h2>Sign up</h2>
 <form action="{{ url_for('add_user') }}" method=post class=add-user>
     Email<input name="email" type="email"required><br>
@@ -32,4 +32,15 @@
     <li><em>Unbelievable. No users so far</em>
         {% endfor %}
 </ul>
+
+<ul class=logged_in_users>
+    <h2>Logged in users</h2>
+    {% for token in logged_in_users %}
+    <li>{{ token }} - {{ logged_in_users[token] }}</li>
+        {% else %}
+    <li><em>No user is logged in.</em>
+        {% endfor %}
+</ul>
+
+
 {% endblock %}

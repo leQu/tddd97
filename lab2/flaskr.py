@@ -1,5 +1,7 @@
 # all the imports
 import sqlite3
+import uuid
+
 from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash
 from contextlib import closing
@@ -16,6 +18,8 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+
+logged_in_users = {}
 
 
 def connect_db():
@@ -48,7 +52,7 @@ def show_users():
             city=row[4],
             country=row[5]
     ) for row in cur.fetchall()]
-    return render_template('show_users.html', users=users)
+    return render_template('show_users.html', users=users, logged_in_users=logged_in_users)
 
 
 @app.route('/signup', methods=['POST'])
@@ -65,6 +69,25 @@ def add_user():
                  [email, password, firstname, familyname, gender, city, country])
     g.db.commit()
     flash('A new user was created successfully')
+    return redirect(url_for('show_users'))
+
+
+@app.route('/signin', methods=['POST'])
+def sign_in():
+    email = request.form['username']
+    password = request.form['password']
+    cur = g.db.execute('select password, email from users where email=? and password=?',
+                       (email, password))
+    row = cur.fetchone()
+    # Creates a new random token in string format
+    if row is None:
+        flash("Wrong username or password!")
+        return redirect(url_for('login'))
+    else:
+        token = str(uuid.uuid4())
+        logged_in_users[token] = email
+        session['token'] = token
+        flash("Logged in!")
     return redirect(url_for('show_users'))
 
 
@@ -91,14 +114,16 @@ def login():
             session['logged_in'] = True
             flash('You were logged in')
             return redirect(url_for('show_entries'))
-    return render_template('login.html', error=error)
+    return render_template('login.html', error=error, logged_in_users=logged_in_users)
 
 
 @app.route('/logout')
 def logout():
-    session.pop('logged_in', None)
+    token = session['token']
+    session.pop('token', None)
+    del logged_in_users[token]
     flash('You were logged out')
-    return redirect(url_for('show_entries'))
+    return redirect(url_for('show_users'))
 
 
 @app.before_request
