@@ -6,7 +6,6 @@ from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash
 from contextlib import closing
 
-
 # configuration
 DATABASE = '/tmp/flaskr.db'
 DEBUG = True
@@ -34,14 +33,29 @@ def init_db():
         db.commit()
 
 
-@app.route('/old')
-def show_entries():
-    cur = g.db.execute('select title, text from entries order by id desc')
-    entries = [dict(title=row[0], text=row[1]) for row in cur.fetchall()]
-    return render_template('show_entries.html', entries=entries)
+@app.route('/', methods=['GET'])
+def start():
+    return redirect('static/client.html')
 
 
-@app.route('/')
+@app.route('/add-user', methods=['POST'])
+def add_user():
+    email = request.form['email']
+    password = request.form['password']
+    firstname = request.form['firstname']
+    familyname = request.form['familyname']
+    gender = request.form['gender']
+    city = request.form['city']
+    country = request.form['country']
+    message = g.db.execute('insert into users (email, password, firstname, familyname, gender, city, country)'
+                           'values (?, ?, ?, ?, ?, ?, ?)',
+                           [email, password, firstname, familyname, gender, city, country])
+    g.db.commit()
+    flash('A new user was created successfully')
+    return message
+
+
+@app.route('/users', methods=['GET'])
 def show_users():
     cur = g.db.execute('select email, firstname, familyname, gender, city, country '
                        'from users order by id desc')
@@ -53,24 +67,8 @@ def show_users():
             city=row[4],
             country=row[5]
     ) for row in cur.fetchall()]
-    return render_template('show_users.html', users=users, logged_in_users=logged_in_users)
 
-
-@app.route('/signup', methods=['POST'])
-def add_user():
-    email = request.form['email']
-    password = request.form['password1']
-    firstname = request.form['firstname']
-    familyname = request.form['familyname']
-    gender = request.form['gender']
-    city = request.form['ci ty']
-    country = request.form['country']
-    g.db.execute('insert into users (email, password, firstname, familyname, gender, city, country)'
-                 'values (?, ?, ?, ?, ?, ?, ?)',
-                 [email, password, firstname, familyname, gender, city, country])
-    g.db.commit()
-    flash('A new user was created successfully')
-    return redirect(url_for('show_users'))
+    return str(users)
 
 
 @app.route('/signin', methods=['POST'])
@@ -138,6 +136,6 @@ def teardown_request(exception):
     if db is not None:
         db.close()
 
+
 if __name__ == '__main__':
     app.run()
-

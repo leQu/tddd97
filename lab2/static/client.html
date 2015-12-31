@@ -8,7 +8,7 @@
     <script src="serverstub.js"></script>
 
 
-    <!---------------- Welcome view ----------------------->
+    <!-- -------------- Welcome view --------------------- -->
     <script type=”text/view” id="welcomeView">
 <div id="main">
     <div id="logo-slogan"><img src="wimage.png"></div>
@@ -24,7 +24,7 @@
 
     <div id="signup">
         <h2>Sign up</h2>
-        <form name="signUpForm" method="post" onsubmit="return signUp()">
+        <form name="signUpForm" onsubmit="signUp()">
             <br>
             Email<input name="email" type="email"required><br>
             Password<input type="password" name="password1" required><br>
@@ -45,7 +45,7 @@
 </script>
 
 
-       <!---------------- Profile view ----------------------->
+       <!-- -------------- Profile view --------------------- -->
     <script type=”text/view” id="profileView">
 
     <div id="main">
@@ -59,7 +59,7 @@
                 <li onclick="signOutUser()">Log out</li>
             </ul>
 
-        <!----- home ------>
+        <!-- --- home ---- -->
         <div id="home">
             <h2>User Info</h2>
             <div id="userInfo"></div>
@@ -75,7 +75,7 @@
         </div>
         </div>
 
-        <!----- browse ------>
+        <!-- --- browse ---- -->
         <div id="browse">
         <h2>Browse</h2>
             <form name="browseForm" method="post">
@@ -84,10 +84,10 @@
             <button onclick="browseUser()">Browse</button>
         </div>
 
-        <!----- account ------>
+        <!-- --- account ---- -->
         <div id="account">
             <h2>Change password</h2>
-            <form name="changePasswordForm"method="post" onsubmit="return changePassword()">
+            <form name="changePasswordForm" method="post" onsubmit="return changePassword()">
                 Old Password<input type="password" name="oldPassword" required><br>
                 New password<input type="password"  name="newPassword" required><br>
                 <input type="submit" value="Change password">
