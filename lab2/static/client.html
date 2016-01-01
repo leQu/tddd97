@@ -14,7 +14,7 @@
     <div id="logo-slogan"><img src="wimage.png"></div>
 
     <div id="login">
-        <form name="signInForm" method="post" onsubmit="return signIn()">
+        <form name="signInForm" onsubmit="signIn(); return false;">
             <br>
             <label>Email</label><input type="text" name="email"><br>
             <label>Password</label><input type="password" name="password"><br>
@@ -24,7 +24,7 @@
 
     <div id="signup">
         <h2>Sign up</h2>
-        <form name="signUpForm" onsubmit="signUp()">
+        <form name="signUpForm" onsubmit="signUp(); return false;">
             <br>
             Email<input name="email" type="email"required><br>
             Password<input type="password" name="password1" required><br>
@@ -87,7 +87,7 @@
         <!-- --- account ---- -->
         <div id="account">
             <h2>Change password</h2>
-            <form name="changePasswordForm" method="post" onsubmit="return changePassword()">
+            <form name="changePasswordForm" method="post" onsubmit="changePassword()">
                 Old Password<input type="password" name="oldPassword" required><br>
                 New password<input type="password"  name="newPassword" required><br>
                 <input type="submit" value="Change password">

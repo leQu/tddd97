@@ -48,7 +48,7 @@ var serverstub = (function() {
         persistLoggedInUsers();
         return {"success": true, "message": "Successfully signed in.", "data": token};
       } else {
-        return {"success": false, "message": "Wrong username or password."};
+        return  {"success": false, "message": "Wrong username or password."};
       }
     },
 

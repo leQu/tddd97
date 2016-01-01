@@ -5,7 +5,7 @@ body {
 
 #main, #profileDiv{
     margin: 50px auto;
-    width: 620px;
+    width: 630px;
 }
 
 #logo-slogan{
@@ -14,7 +14,7 @@ body {
 }
 
 #login, #signup{
-    width: 250px;
+    width: 270px;
 }
 
 #login form, #signup form{

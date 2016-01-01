@@ -1,18 +1,19 @@
 # all the imports
-import sqlite3
 import uuid
-
+import database_helper
 from flask import Flask, request, session, g, redirect, url_for, \
-    abort, render_template, flash
-from contextlib import closing
+    abort, render_template, flash, jsonify
+
+# from contextlib import closing
 
 # configuration
+'''
 DATABASE = '/tmp/flaskr.db'
 DEBUG = True
 SECRET_KEY = 'development key'
 USERNAME = 'admin'
 PASSWORD = 'default'
-
+'''
 # create our little application :)
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -21,7 +22,7 @@ app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 logged_in_users = {}
 
-
+'''
 def connect_db():
     return sqlite3.connect(app.config['DATABASE'])
 
@@ -31,11 +32,22 @@ def init_db():
         with app.open_resource('schema.sql', mode='r') as f:
             db.cursor().executescript(f.read())
         db.commit()
+'''
 
 
 @app.route('/', methods=['GET'])
 def start():
     return redirect('static/client.html')
+
+
+@app.route('/get-user-data-by-token/<token>', methods=['GET'])
+def get_user_data_by_token(token):
+    email = logged_in_users.get(token)
+    if email is None:
+        return jsonify({"success": False, "message": "Token doesn't exists."})
+    else:
+        data = database_helper.get_user_data(email)
+        return jsonify({"success": True, "message": "Token exists.", "data": data})
 
 
 @app.route('/add-user', methods=['POST'])
@@ -47,49 +59,33 @@ def add_user():
     gender = request.form['gender']
     city = request.form['city']
     country = request.form['country']
-    message = g.db.execute('insert into users (email, password, firstname, familyname, gender, city, country)'
-                           'values (?, ?, ?, ?, ?, ?, ?)',
-                           [email, password, firstname, familyname, gender, city, country])
-    g.db.commit()
-    flash('A new user was created successfully')
-    return message
+    message = database_helper.add_user(email, password, firstname, familyname, gender, city, country)
+    return str(message)
 
 
 @app.route('/users', methods=['GET'])
 def show_users():
-    cur = g.db.execute('select email, firstname, familyname, gender, city, country '
-                       'from users order by id desc')
-    users = [dict(
-            email=row[0],
-            firstname=row[1],
-            familyname=row[2],
-            gender=row[3],
-            city=row[4],
-            country=row[5]
-    ) for row in cur.fetchall()]
-
-    return str(users)
+    return str(database_helper.get_all_users())
 
 
-@app.route('/signin', methods=['POST'])
+@app.route('/sign-in', methods=['POST'])
 def sign_in():
     email = request.form['username']
     password = request.form['password']
-    cur = g.db.execute('select password, email from users where email=? and password=?',
-                       (email, password))
-    row = cur.fetchone()
-    # Creates a new random token in string format
-    if row is None:
-        flash("Wrong username or password!")
-        return redirect(url_for('login'))
-    else:
+    is_valid = database_helper.is_valid_login(email, password)
+    if is_valid:
         token = str(uuid.uuid4())
         logged_in_users[token] = email
-        session['token'] = token
-        flash("Logged in!")
-    return redirect(url_for('show_users'))
+        return jsonify({"success": True, "message": "Successfully signed in.", "data": token})
+    else:
+        return jsonify({"success": False, "message": "Wrong username or password."})
 
 
+@app.route('/logged-in-users', methods=['GET'])
+def show_logged_in_users():
+    return str(logged_in_users)
+
+'''
 @app.route('/add', methods=['POST'])
 def add_entry():
     if not session.get('logged_in'):
@@ -114,6 +110,7 @@ def login():
             flash('You were logged in')
             return redirect(url_for('show_entries'))
     return render_template('login.html', error=error, logged_in_users=logged_in_users)
+'''
 
 
 @app.route('/logout')
@@ -121,10 +118,10 @@ def logout():
     token = session['token']
     session.pop('token', None)
     del logged_in_users[token]
-    flash('You were logged out')
     return redirect(url_for('show_users'))
 
 
+'''
 @app.before_request
 def before_request():
     g.db = connect_db()
@@ -135,7 +132,7 @@ def teardown_request(exception):
     db = getattr(g, 'db', None)
     if db is not None:
         db.close()
-
+'''
 
 if __name__ == '__main__':
     app.run()

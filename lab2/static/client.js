@@ -1,9 +1,12 @@
 window.onload = function(){
-    var token = localStorage.getItem("token");
-    if (token === 'undefined' || token === null ){
-        displayView("welcomeView");
-    }
-    else displayView("profileView");
+    displayView("welcomeView");
+
+    /* var token = localStorage.getItem("token");
+     if (token === 'undefined' || token === null ){
+     displayView("welcomeView");
+     }
+     else displayView("profileView");
+     */
 }
 
 function displayView(viewId){
@@ -24,12 +27,21 @@ function displayTab(tabId, email){
     if (tabId === "home") {
         if (typeof email === 'undefined'){
             var token = localStorage.getItem("token");
-            email = serverstub.getUserDataByToken(token).data.email;
+            sendGETrequest("/get-user-data-by-token/" + token, updateHomeTabResponse)
         }
-        updateUserInfo(email);
-        updateWall(email);
+        else updateHomeTab(email);
     }
 }
+
+function updateHomeTabResponse(response){
+    updateHomeTab(response.data.email);
+}
+
+function updateHomeTab(email){
+    updateUserInfo(email);
+    updateWall(email);
+}
+
 
 function getMessagesString(messages){
     var string = "";
@@ -83,9 +95,11 @@ function browseUser(){
 function signIn(){
     var username = document.forms["signInForm"]["email"].value;
     var password = document.forms["signInForm"]["password"].value;
+    var params = "username="+username+"&password="+password;
+    sendPOSTrequest("/sign-in", params, signInResponse);
+}
 
-    var response = serverstub.signIn(username, password);
-
+function signInResponse(response){
     if (response.success){
         localStorage.setItem("token", response.data);
         displayView("profileView");
@@ -140,12 +154,14 @@ function signUp() {
     params += "country="+dataObject.country;
 
     //var respons = serverstub.signUp(dataObject);
-    var response = sendPOSTrequest("/add-user", params);
+    sendPOSTrequest("/add-user", params, signUpResponse);
     // Successful signup
     //if (response.success){
-    alert(response);
     //}
-    return 0;
+}
+
+function signUpResponse(response){
+    alert(response);
 }
 
 function signUpFormToDataObject(){
@@ -182,34 +198,27 @@ function isSignUpFormValid() {
     return true;
 }
 
-function sendPOSTrequest(url, postData){
-
-    var http = new XMLHttpRequest();
-    http.open("POST", url, true);
-
-//Send the proper header information along with the request
-    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-
-    http.onreadystatechange = function() {//Call a function when the state changes.
-        if(http.readyState == 4 && http.status == 200) {
-            alert(http.responseText);
+function sendPOSTrequest(url, postData, callback){
+    var xmlHttp = new XMLHttpRequest();
+    var async = true;
+    xmlHttp.open("POST", url, async);
+    xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
+        if(xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            callback(JSON.parse(xmlHttp.responseText));
         }
     }
-    http.send(postData);
+    xmlHttp.send(postData);
+}
 
-
-
-    /*var method = "POST";
-     var async = true;
-     var request = new XMLHttpRequest();
-
-     // Specifies how the HTTP response will be handled.
-     request.onload = function () {
-     return request.responseText;
-     }
-
-     request.open(method, url, async);
-     request.setRequestHeader("Content-Type", "application/content;charset=UTF-8");
-     request.send(postData);
-     */
+function sendGETrequest(url, callback) {
+    var xmlHttp = new XMLHttpRequest();
+    var async = true;
+    xmlHttp.open("GET", url, async);
+    xmlHttp.onreadystatechange = function () {
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            callback(JSON.parse(xmlHttp.responseText));
+        }
+    }
+    xmlHttp.send(null);
 }
