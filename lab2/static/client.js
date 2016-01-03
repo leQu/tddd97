@@ -25,21 +25,22 @@ function displayTab(tabId, email){
     document.getElementById(tabId).style.display = "block";
 
     if (tabId === "home") {
+        // if email is undefined it is assumed that the logged in user's home page
+        // is supposed to be displayed.
         if (typeof email === 'undefined'){
             var token = localStorage.getItem("token");
-            sendGETrequest("/get-user-data-by-token/" + token, updateHomeTabResponse)
+            sendGETrequest("/get-user-data-by-token/" + token, function (response){
+                if(response.success) updateHomeTab(response.data.email)
+            });
         }
         else updateHomeTab(email);
     }
 }
 
-function updateHomeTabResponse(response){
-    updateHomeTab(response.data.email);
-}
 
 function updateHomeTab(email){
     updateUserInfo(email);
-    updateWall(email);
+    //updateWall(email);
 }
 
 
@@ -65,15 +66,18 @@ function getUserString(user){
 function sendMessage(toEmail){
     var message = document.forms["wallForm"]["message"].value;
     var token = localStorage.getItem("token");
-    serverstub.postMessage(token,message,toEmail);
+    serverstub.postMessage(token, message, toEmail);
     updateWall(toEmail);
 }
 
 function updateUserInfo(email){
     var token = localStorage.getItem("token");
-    var user = serverstub.getUserDataByEmail(token,email);
     var userInfoDiv = document.getElementById("userInfo");
-    userInfoDiv.innerHTML = getUserString(user.data);
+    sendGETrequest("/get-user-data-by-email/" + token + "/" + email, function (response){
+        if(response.success){
+            userInfoDiv.innerHTML = JSON.stringify(response.data, null, 4);
+        }
+    });
 }
 
 function updateWall(email){
