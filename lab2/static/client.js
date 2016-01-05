@@ -1,12 +1,12 @@
 window.onload = function(){
     displayView("welcomeView");
 
-    /* var token = localStorage.getItem("token");
-     if (token === 'undefined' || token === null ){
-     displayView("welcomeView");
-     }
-     else displayView("profileView");
-     */
+    var token = localStorage.getItem("token");
+    if (token === 'undefined' || token === null ){
+        displayView("welcomeView");
+    }
+    else displayView("profileView");
+
 }
 
 function displayView(viewId){
@@ -39,16 +39,19 @@ function displayTab(tabId, email){
 
 
 function updateHomeTab(email){
+    // This classname keeps track of whose wall we are watching.
+    document.getElementById("wall").className = email;
+
     updateUserInfo(email);
-    //updateWall(email);
+    updateWall(email);
 }
 
 
 function getMessagesString(messages){
     var string = "";
-    for (var i=0;i<messages.data.length; i++){
-        string += messages.data[i].writer + ":<br>";
-        string += messages.data[i].content + "<br><br>";
+    for (var i=0;i<messages.length; i++){
+        string += messages[i].fromUser + ":<br>";
+        string += messages[i].content + "<br><br>";
     }
     return string;
 }
@@ -66,8 +69,11 @@ function getUserString(user){
 function sendMessage(toEmail){
     var message = document.forms["wallForm"]["message"].value;
     var token = localStorage.getItem("token");
-    serverstub.postMessage(token, message, toEmail);
-    updateWall(toEmail);
+    var postData = "message=" + message + "&token=" + token + "&email=" + toEmail;
+    sendPOSTrequest("/add-message", postData, function(response){
+        if(response.success) updateWall(toEmail);
+        else alert(response.message);
+    });
 }
 
 function updateUserInfo(email){
@@ -75,19 +81,25 @@ function updateUserInfo(email){
     var userInfoDiv = document.getElementById("userInfo");
     sendGETrequest("/get-user-data-by-email/" + token + "/" + email, function (response){
         if(response.success){
-            userInfoDiv.innerHTML = JSON.stringify(response.data, null, 4);
+            userInfoDiv.innerHTML = "Email: " + response.data.email + "<br>";
+            userInfoDiv.innerHTML += "Firstname: " + response.data.firstname + "<br>";
+            userInfoDiv.innerHTML += "Familyname: " + response.data.familyname + "<br>";
+            userInfoDiv.innerHTML += "Gender: " + response.data.gender + "<br>";
+            userInfoDiv.innerHTML += "City: " + response.data.city + "<br>";
+            userInfoDiv.innerHTML += "Country: " + response.data.country + "<br>";
         }
     });
 }
 
 function updateWall(email){
     var token = localStorage.getItem("token");
-    var messages = serverstub.getUserMessagesByEmail(token,email);
     var messagesDiv  = document.getElementById("messages");
-    messagesDiv.innerHTML = getMessagesString(messages);
-    console.log(messages);
-    // This classname keeps track of whose wall we are watching.
-    document.getElementById("wall").className = email;
+    sendGETrequest("/get-user-messages-by-email/" + token + "/" + email, function(response){
+        if (response.success){
+            messagesDiv.innerHTML = getMessagesString(response.data);
+        }
+        else messagesDiv.innerHTML = response.message;
+    });
 }
 
 function browseUser(){
@@ -95,36 +107,39 @@ function browseUser(){
     displayTab("home", email);
 }
 
-
 function signIn(){
     var username = document.forms["signInForm"]["email"].value;
     var password = document.forms["signInForm"]["password"].value;
-    var params = "username="+username+"&password="+password;
-    sendPOSTrequest("/sign-in", params, signInResponse);
+    var postData = "username="+username+"&password="+password;
+    sendPOSTrequest("/sign-in", postData, function(response){
+        if (response.success){
+            localStorage.setItem("token", response.data);
+            displayView("profileView");
+        }
+        else alert(response.message);
+    });
 }
 
-function signInResponse(response){
-    if (response.success){
-        localStorage.setItem("token", response.data);
-        displayView("profileView");
-    }
-    else alert(response.message);
-}
-
-function signOutUser(){
-    var response = serverstub.signOut(localStorage.getItem("token"));
-    if (response.success){
+function signOut(){
+    var postData = "token="+localStorage.getItem("token");
+    sendPOSTrequest("/sign-out",postData,function(response){
         localStorage.removeItem("token");
+        if (!response.success){
+            alert(response.message);
+        }
         displayView("welcomeView");
-    }
+    });
 }
 
 function changePassword(){
     var newPassword = document.forms["changePasswordForm"]["newPassword"].value;
     var oldPassword = document.forms["changePasswordForm"]["oldPassword"].value;
-    var response = serverstub.changePassword(localStorage.getItem("token"),oldPassword,newPassword);
+    var token = localStorage.getItem("token");
+    var postData = "token=" + token + "&old_password=" + oldPassword + "&new_password=" + newPassword;
+    sendPOSTrequest("/change-password",postData, function(response){
+        alert(response.message);
+    });
 }
-
 
 function signUpFormToDataObject(){
     var dataObject = new Object();
@@ -149,24 +164,19 @@ function signUp() {
     // Create data object
     var dataObject = signUpFormToDataObject();
 
-    var params = "email="+dataObject.email+"&";
-    params += "password="+dataObject.password+"&";
-    params += "firstname="+dataObject.firstname+"&";
-    params += "familyname="+dataObject.familyname+"&";
-    params += "gender="+dataObject.gender+"&";
-    params += "city="+dataObject.city+"&";
-    params += "country="+dataObject.country;
+    var postData = "email="+dataObject.email+"&";
+    postData += "password="+dataObject.password+"&";
+    postData += "firstname="+dataObject.firstname+"&";
+    postData += "familyname="+dataObject.familyname+"&";
+    postData += "gender="+dataObject.gender+"&";
+    postData += "city="+dataObject.city+"&";
+    postData += "country="+dataObject.country;
 
-    //var respons = serverstub.signUp(dataObject);
-    sendPOSTrequest("/add-user", params, signUpResponse);
-    // Successful signup
-    //if (response.success){
-    //}
+    sendPOSTrequest("/add-user", postData, function(response){
+        alert(response);
+    });
 }
 
-function signUpResponse(response){
-    alert(response);
-}
 
 function signUpFormToDataObject(){
     var dataObject = new Object();

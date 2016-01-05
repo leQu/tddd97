@@ -21,16 +21,16 @@ def init_db():
             db.cursor().executescript(f.read())
         db.commit()
 
-'''
 
 def query_db(query, args=(), one=False):
     cur = get_db().execute(query, args)
-    rv = cur.fetchall()
+    rv = [dict((cur.description[i][0], value) \
+               for i, value in enumerate(row)) for row in cur.fetchall()]
     cur.close()
     return (rv[0] if rv else None) if one else rv
 
-'''
 
+'''
 
 def query_db(query, args=(), one=False):
     cur = connect_to_database().cursor()
@@ -39,6 +39,7 @@ def query_db(query, args=(), one=False):
               for i, value in enumerate(row)) for row in cur.fetchall()]
     cur.connection.close()
     return (r[0] if r else None) if one else r
+'''
 
 
 def get_all_users():
@@ -47,15 +48,40 @@ def get_all_users():
     return users
 
 
+def get_all_messages():
+    messages = query_db('select content, fromUser, toUser  from messages')
+    return messages
+
+
 def get_user_data(email):
     user_data = query_db('select email, firstname, familyname, gender, city, country from users where email=? ',
                          [email])
     return user_data[0]
 
 
+def get_user_messages(email):
+    messages = query_db('select id, content, toUser, fromUser from messages where toUser=? order by id desc',
+                        [email])
+    return messages
+
+
+def update_password(email, password):
+    response = query_db('update users set password=? where email=?',
+                        [password, email])
+    get_db().commit()
+    return response
+
+
 def add_user(email, password, firstname, familyname, gender, city, country):
     response = query_db('insert into users values (?, ?, ?, ?, ?, ?, ?)',
                         [email, password, firstname, familyname, gender, city, country])
+    get_db().commit()
+    return response
+
+
+def add_message(message, from_user, to_user):
+    response = query_db('insert into messages(content, toUser, fromUser) values (?, ?, ?)',
+                        [message, to_user, from_user])
     get_db().commit()
     return response
 

@@ -56,7 +56,7 @@
                 <li onclick="displayTab('home')">Home</li>
                 <li onclick="displayTab('browse')">Browse</li>
                 <li onclick="displayTab('account')">Account</li>
-                <li onclick="signOutUser()">Log out</li>
+                <li onclick="signOut()">Log out</li>
             </ul>
 
         <!-- --- home ---- -->
@@ -87,11 +87,12 @@
         <!-- --- account ---- -->
         <div id="account">
             <h2>Change password</h2>
-            <form name="changePasswordForm" method="post" onsubmit="changePassword()">
+            <form name="changePasswordForm" method="post">
                 Old Password<input type="password" name="oldPassword" required><br>
                 New password<input type="password"  name="newPassword" required><br>
-                <input type="submit" value="Change password">
             </form>
+            <button onclick="changePassword()">Browse</button>
+
         </div>
 
       </div>
