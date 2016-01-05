@@ -1,6 +1,6 @@
 drop table if exists users;
 create table users (
-  email TEXT NOT NULL,
+  email TEXT PRIMARY KEY ,
   password TEXT NOT NULL,
   firstname text,
   familyname text,

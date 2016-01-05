@@ -1,4 +1,5 @@
 import uuid
+import sqlite3
 import database_helper
 from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash, jsonify
@@ -110,8 +111,11 @@ def add_user():
     gender = request.form['gender']
     city = request.form['city']
     country = request.form['country']
-    message = database_helper.add_user(email, password, firstname, familyname, gender, city, country)
-    return str(message)
+    try:
+        database_helper.add_user(email, password, firstname, familyname, gender, city, country)
+        return jsonify({"success": True, "message": "User created successfully."})
+    except sqlite3.Error:
+        return jsonify({"success": False, "message": "Could not add user. Email already exists?"})
 
 
 @app.route('/add-message', methods=['POST'])
@@ -121,32 +125,13 @@ def add_message():
     to_user = request.form['email']
     if token in logged_in_users:
         from_user = logged_in_users[token]
-        message = database_helper.add_message(message, from_user, to_user)
-        return jsonify({"success": True, "message": message})
+        try:
+            database_helper.add_message(message, from_user, to_user)
+            return jsonify({"success": True, "message": "Successfully added user."})
+        except sqlite3.Error:
+            return jsonify({"success": False, "message": "Database error. Could not post message."})
     else:
         return jsonify({"success": False, "message": "You must log in to post message."})
-
-
-@app.route('/temp', methods=['GET'])
-def temp():
-    message = database_helper.add_message("Test message 23", "hej@hej.hej", "hej@hej.hej")
-    return str(message)
-
-
-@app.route('/users', methods=['GET'])
-def show_users():
-    return jsonify({"data": database_helper.get_all_users()})
-
-
-@app.route('/messages', methods=['GET'])
-def show_messages():
-    return jsonify({"data": database_helper.get_all_messages()})
-
-
-@app.route('/get-user-data-temp', methods=['GET'])
-def get_user_data_temp():
-    data = database_helper.get_user_data("hej@hej.hej")
-    return jsonify({"success": True, "message": "Temp.", "data": data})
 
 
 @app.route('/sign-in', methods=['POST'])
@@ -175,6 +160,28 @@ def sign_out():
 @app.route('/logged-in-users', methods=['GET'])
 def show_logged_in_users():
     return str(logged_in_users)
+
+
+@app.route('/temp', methods=['GET'])
+def temp():
+    database_helper.temp()
+    try:
+        database_helper.add_user("email@email.email", "x", "x", "x", "x", "x", "x")
+        return "success!"
+    except sqlite3.Error:
+        return "error!"
+
+
+@app.route('/users', methods=['GET'])
+def show_users():
+    return jsonify({"data": database_helper.get_all_users()})
+
+
+@app.route('/messages', methods=['GET'])
+def show_messages():
+    return jsonify({"data": database_helper.get_all_messages()})
+
+
 
 
 if __name__ == '__main__':

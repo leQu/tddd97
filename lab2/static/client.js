@@ -55,17 +55,6 @@ function getMessagesString(messages){
     }
     return string;
 }
-
-function getUserString(user){
-    return "" +
-        user.firstname + "<br>" +
-        user.familyname + "<br>" +
-        user.gender + "<br>" +
-        user.city + "<br>" +
-        user.country + "<br>" +
-        user.email;
-}
-
 function sendMessage(toEmail){
     var message = document.forms["wallForm"]["message"].value;
     var token = localStorage.getItem("token");
@@ -73,21 +62,6 @@ function sendMessage(toEmail){
     sendPOSTrequest("/add-message", postData, function(response){
         if(response.success) updateWall(toEmail);
         else alert(response.message);
-    });
-}
-
-function updateUserInfo(email){
-    var token = localStorage.getItem("token");
-    var userInfoDiv = document.getElementById("userInfo");
-    sendGETrequest("/get-user-data-by-email/" + token + "/" + email, function (response){
-        if(response.success){
-            userInfoDiv.innerHTML = "Email: " + response.data.email + "<br>";
-            userInfoDiv.innerHTML += "Firstname: " + response.data.firstname + "<br>";
-            userInfoDiv.innerHTML += "Familyname: " + response.data.familyname + "<br>";
-            userInfoDiv.innerHTML += "Gender: " + response.data.gender + "<br>";
-            userInfoDiv.innerHTML += "City: " + response.data.city + "<br>";
-            userInfoDiv.innerHTML += "Country: " + response.data.country + "<br>";
-        }
     });
 }
 
@@ -141,6 +115,32 @@ function changePassword(){
     });
 }
 
+
+function getUserString(user){
+    return "" +
+        user.firstname + "<br>" +
+        user.familyname + "<br>" +
+        user.gender + "<br>" +
+        user.city + "<br>" +
+        user.country + "<br>" +
+        user.email;
+}
+
+function updateUserInfo(email){
+    var token = localStorage.getItem("token");
+    var userInfoDiv = document.getElementById("userInfo");
+    sendGETrequest("/get-user-data-by-email/" + token + "/" + email, function (response){
+        if(response.success){
+            userInfoDiv.innerHTML = "Email: " + response.data.email + "<br>";
+            userInfoDiv.innerHTML += "Firstname: " + response.data.firstname + "<br>";
+            userInfoDiv.innerHTML += "Familyname: " + response.data.familyname + "<br>";
+            userInfoDiv.innerHTML += "Gender: " + response.data.gender + "<br>";
+            userInfoDiv.innerHTML += "City: " + response.data.city + "<br>";
+            userInfoDiv.innerHTML += "Country: " + response.data.country + "<br>";
+        }
+    });
+}
+
 function signUpFormToDataObject(){
     var dataObject = new Object();
     dataObject.email = document.forms["signUpForm"]["email"].value;
@@ -163,7 +163,6 @@ function signUp() {
     if (!isSignUpFormValid()) return false;
     // Create data object
     var dataObject = signUpFormToDataObject();
-
     var postData = "email="+dataObject.email+"&";
     postData += "password="+dataObject.password+"&";
     postData += "firstname="+dataObject.firstname+"&";
@@ -213,19 +212,14 @@ function isSignUpFormValid() {
 }
 
 function sendPOSTrequest(url, postData, callback){
-    var xmlHttp = new XMLHttpRequest();
-    var async = true;
-    xmlHttp.open("POST", url, async);
-    xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
-        if(xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-            callback(JSON.parse(xmlHttp.responseText));
-        }
-    }
-    xmlHttp.send(postData);
+    sendRequest(url, postData, callback);
 }
 
 function sendGETrequest(url, callback) {
+    sendRequest(url, null, callback);
+}
+
+function sendRequest(url, postData, callback){
     var xmlHttp = new XMLHttpRequest();
     var async = true;
     xmlHttp.open("GET", url, async);
@@ -234,5 +228,5 @@ function sendGETrequest(url, callback) {
             callback(JSON.parse(xmlHttp.responseText));
         }
     }
-    xmlHttp.send(null);
+    xmlHttp.send(postData);
 }

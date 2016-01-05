@@ -42,6 +42,12 @@ def query_db(query, args=(), one=False):
 '''
 
 
+def temp():
+    response = query_db('delete from users where email = "email@email.email"')
+    get_db().commit()
+    return response
+
+
 def get_all_users():
     users = query_db('select email, firstname, familyname, gender, city, country '
                      'from users')
@@ -73,10 +79,10 @@ def update_password(email, password):
 
 
 def add_user(email, password, firstname, familyname, gender, city, country):
-    response = query_db('insert into users values (?, ?, ?, ?, ?, ?, ?)',
-                        [email, password, firstname, familyname, gender, city, country])
-    get_db().commit()
-    return response
+
+        query_db('insert into users values (?, ?, ?, ?, ?, ?, ?)',
+                 [email, password, firstname, familyname, gender, city, country])
+        get_db().commit()
 
 
 def add_message(message, from_user, to_user):
