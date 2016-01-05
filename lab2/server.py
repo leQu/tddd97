@@ -88,6 +88,19 @@ def get_user_messages_by_email(token, email):
         return jsonify({"success": True, "message": "Email exists.", "data": messages})
 
 
+@app.route('/get-user-messages-by-token/<token>', methods=['GET'])
+def get_user_messages_by_token(token):
+    if token not in logged_in_users:
+        return jsonify({"success": False, "message": "You must login to access this data."})
+    else:
+        email = logged_in_users[token]
+        messages = database_helper.get_user_messages(email)
+        if not messages:
+            return jsonify({"success": True, "message": "No messages so far."})
+        else:
+            return jsonify({"success": True, "message": "Messages exists.", "data": messages})
+
+
 @app.route('/add-user', methods=['POST'])
 def add_user():
     email = request.form['email']
