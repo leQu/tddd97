@@ -172,7 +172,7 @@ function signUp() {
     postData += "country="+dataObject.country;
 
     sendPOSTrequest("/add-user", postData, function(response){
-        alert(response);
+        alert(response.message);
     });
 }
 
