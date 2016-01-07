@@ -212,14 +212,19 @@ function isSignUpFormValid() {
 }
 
 function sendPOSTrequest(url, postData, callback){
-    sendRequest(url, postData, callback);
+    var xmlHttp = new XMLHttpRequest();
+    var async = true;
+    xmlHttp.open("POST", url, async);
+    xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlHttp.onreadystatechange = function() {//Call a function when the state changes.
+        if(xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            callback(JSON.parse(xmlHttp.responseText));
+        }
+    }
+    xmlHttp.send(postData);
 }
 
 function sendGETrequest(url, callback) {
-    sendRequest(url, null, callback);
-}
-
-function sendRequest(url, postData, callback){
     var xmlHttp = new XMLHttpRequest();
     var async = true;
     xmlHttp.open("GET", url, async);
@@ -228,5 +233,5 @@ function sendRequest(url, postData, callback){
             callback(JSON.parse(xmlHttp.responseText));
         }
     }
-    xmlHttp.send(postData);
+    xmlHttp.send(null);
 }
