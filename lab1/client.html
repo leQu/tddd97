@@ -14,7 +14,7 @@
     <div id="logo-slogan"><img src="wimage.png"></div>
 
     <div id="login">
-        <form name="signInForm" method="post" onsubmit="return signIn()">
+        <form name="signInForm" method="post" onsubmit="event.preventDefault(); signIn();">
             <br>
             <label>Email</label><input type="text" name="email"><br>
             <label>Password</label><input type="password" name="password"><br>
@@ -22,9 +22,9 @@
         </form>
     </div>
 
-    <div id="signup">
+   <div id="signup">
         <h2>Sign up</h2>
-        <form name="signUpForm" method="post" onsubmit="return signUp()">
+        <form name="signUpForm" method="post" onsubmit="event.preventDefault(); sign_up();">
             <br>
             Email<input name="email" type="email"required><br>
             Password<input type="password" name="password1" required><br>
@@ -38,7 +38,7 @@
             </select><br>
             City<input type="text" name="city" required><br>
             Country<input type="text" name="country" required><br>
-            <input type="submit" value="Sign up">
+            <input type="submit" value="Sign up"><br /><span id="status"></span>
         </form>
     </div>
 </div>
@@ -78,16 +78,16 @@
         <!----- browse ------>
         <div id="browse">
         <h2>Browse</h2>
-            <form name="browseForm" method="post">
+            <form name="browseForm" method="post" onsubmit="event.preventDefault(); browseUser();">
                     <input type="text" name="userEmail">
+                    <input type="submit" value="Browse">
             </form>
-            <button onclick="browseUser()">Browse</button>
         </div>
 
         <!----- account ------>
         <div id="account">
             <h2>Change password</h2>
-            <form name="changePasswordForm" method="post" onsubmit="return changePassword()">
+            <form name="changePasswordForm" method="post" onsubmit="event.preventDefault(); changePassword();">
                 Old Password<input type="password" name="oldPassword" required><br>
                 New password<input type="password"  name="newPassword" required><br>
                 <input type="submit" value="Change password">

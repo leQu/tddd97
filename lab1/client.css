@@ -1,48 +1,48 @@
 body{
-background-color: #0C86EB;
+    background-color: #0C86EB;
 }
 
 #main{
-margin:100px auto;
-width: 610px;
+    margin:100px auto;
+    width: 608px;
 }
 
 #logo-slogan{
-width:340px;
-height: 400px;
+    width: 340px;
+    height: 400px;
 }
 
 #login, #signup{
-width: 250px;
+    width: 250px;
 }
 
 #login form, #signup form{
-text-align:right;
-margin: 0 5px;
+    text-align:right;
+    margin: 0 5px;
 }
 
 h2{
-text-align:center;
-margin-bottom:0;}
+    text-align:center;
+    margin-bottom:0;}
 
 input[type="text"], input[type="password"], select{
-width:120px;
-margin:2px;
+    width:120px;
+    margin:2px;
 }
 
 #login{
-height: 100px;
+    height: 100px;
 }
 
 #signup{
-height: 290px;
+    height: 290px;
 }
 
 #login, #signup, #logo-slogan, #profileDiv{
-background-color: white;
-border: 3px solid black;
-margin:2px;
-float:left;
+    background-color: white;
+    border: 2px solid black;
+    margin:2px;
+    float:left;
 }
 
 #account, #browse{
@@ -51,4 +51,9 @@ float:left;
 
 #home form {
     display:inline;
+}
+
+h2 {
+    margin:0;
+    padding: 5px 0 0;
 }

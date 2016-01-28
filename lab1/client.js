@@ -1,9 +1,13 @@
+
+
 window.onload = function(){
     var token = localStorage.getItem("token");
     if (token === 'undefined' || token === null ){
         displayView("welcomeView");
+        addPasswordListeners();
     }
     else displayView("profileView");
+
 }
 
 function displayView(viewId){
@@ -64,6 +68,8 @@ function updateUserInfo(email){
     userInfoDiv.innerHTML = getUserString(user.data);
 }
 
+// Not working when messages being added from other places. Probable reason:
+// http://stackoverflow.com/questions/7374355/localstorage-setitem-not-persisting-on-refresh
 function updateWall(email){
     var token = localStorage.getItem("token");
     var messages = serverstub.getUserMessagesByEmail(token,email);
@@ -79,17 +85,14 @@ function browseUser(){
     displayTab("home", email);
 }
 
-function signUp() {
-    if (!isSignUpFormValid()) return false;
+function sign_up() {
     // Create data object
     var dataObject = signUpFormToDataObject();
-
     var response = serverstub.signUp(dataObject);
-    // Successful signup
-    if (response.success){
-        alert(response.message);
-    }
-    else alert(response.message);
+
+
+    if (response.success) document.getElementsByName("signUpForm")[0].reset();
+    document.getElementById("status").innerHTML = response.message;
 }
 
 function signIn(){
@@ -167,17 +170,24 @@ function getOptionsSelectedValue(optionName) {
     return element.options[element.selectedIndex].text;
 }
 
-function isSignUpFormValid() {
-    // Passwords must be equal
-    var password1 = document.forms["signUpForm"]["password1"].value;
-    var password2 = document.forms["signUpForm"]["password2"].value;
-    if (password1 != password2) {
-        alert("Password must be the same");
-        return false;
+function addPasswordListeners(){
+    var p1 = document.forms["signUpForm"]["password1"];
+    var p2 = document.forms["signUpForm"]["password2"];
+
+    p1.addEventListener('change', checkPasswordValidity, false);
+    p2.addEventListener('change', checkPasswordValidity, false);
+}
+
+function checkPasswordValidity(){
+
+    var password1 = document.forms["signUpForm"]["password1"];
+    var password2 = document.forms["signUpForm"]["password2"];
+
+    if (password1.value.length < 8){
+        password2.setCustomValidity("Password must be at least 8 characters.");
     }
-    if (password1.length < 8){
-        alert("Password must be at least 8 characters.");
-        return false;
+    else if (password1.value != password2.value) {
+        password2.setCustomValidity("Passwords don't Match");
     }
-    return true;
+    else password2.setCustomValidity("");
 }
