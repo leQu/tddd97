@@ -1,5 +1,3 @@
-
-
 window.onload = function(){
     var token = localStorage.getItem("token");
     if (token === 'undefined' || token === null ){
@@ -104,7 +102,7 @@ function signIn(){
         localStorage.setItem("token", response.data);
         displayView("profileView");
     }
-    else alert(response.message);
+    else document.getElementById("login-status").innerHTML = response.message;
 }
 
 function signOutUser(){
@@ -138,18 +136,6 @@ function getOptionsSelectedValue(optionName) {
     var element = document.getElementsByName(optionName)[0];
     if (element.selectedIndex == -1)return null;
     return element.options[element.selectedIndex].text;
-}
-
-function signUp() {
-    if (!isSignUpFormValid()) return false;
-    // Create data object
-    var dataObject = signUpFormToDataObject();
-    var respons = serverstub.signUp(dataObject);
-    // Successful signup
-    if (respons.success){
-        alert(respons.message);
-    }
-
 }
 
 function signUpFormToDataObject(){
