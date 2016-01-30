@@ -174,6 +174,14 @@ def temp():
         return "error!"
 
 
+@app.route('/is-logged-in/<token>', methods=['GET'])
+def is_logged_in(token):
+    if token in logged_in_users:
+        return jsonify({"success": True, "message": True})
+    else:
+        return jsonify({"success": True, "message": False})
+
+
 @app.route('/users', methods=['GET'])
 def show_users():
     return jsonify({"data": database_helper.get_all_users()})

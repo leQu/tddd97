@@ -1,11 +1,17 @@
 window.onload = function(){
-    var token = localStorage.getItem("token");
-    if (token === 'undefined' || token === null ){
-        displayView("welcomeView");
-        addPasswordListeners();
+  var token = localStorage.getItem("token");
+    if (token != 'undefined' && token != null ){
+        sendGETrequest("/is-logged-in/" + token, function (response){
+            console.log(response);
+            if (response.message) {
+                displayView("profileView");
+            }
+            else displayView("welcomeView");
+        });
     }
-    else displayView("profileView");
-}
+    else{
+        displayView("welcomeView");
+    }}
 
 function displayView(viewId){
     var view = document.getElementById(viewId).innerHTML;
