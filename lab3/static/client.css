@@ -1,0 +1,63 @@
+body {
+    font-family: sans-serif;
+    background: #eee;
+}
+
+#main, #profileDiv{
+    margin: 50px auto;
+    width: 630px;
+}
+
+#logo-slogan{
+    width:340px;
+    height: 400px;
+}
+
+#login, #signup{
+    width: 270px;
+}
+
+#login form, #signup form{
+    text-align:right;
+    margin: 0 5px;
+}
+
+h2{
+    text-align:center;
+    margin-bottom:0;}
+
+input[type="text"], input[type="password"], select{
+    width:120px;
+    margin:2px;
+}
+
+#login{
+    height: 100px;
+}
+
+#signup{
+    height: 290px;
+}
+
+#profileDiv{
+    padding: 10px;
+}
+
+#login, #signup, #logo-slogan, #profileDiv{
+    background-color: white;
+    border: 3px solid black;
+    margin:2px;
+    float:left;
+}
+
+#account, #browse{
+    display: none;
+}
+
+#home form {
+    display:inline;
+}
+
+
+a, h1, h2       { color: #377ba8; }
+h1, h2          { font-family: 'Georgia', serif; margin: 0; }

@@ -1,22 +1,17 @@
-import uuid
-import sqlite3
-import database_helper
-import time
 from geventwebsocket.handler import WebSocketHandler
 from gevent.pywsgi import WSGIServer
 from werkzeug.serving import run_with_reloader
-from geventwebsocket.handler import WebSocketHandler
-from flask import Flask, request, session, g, redirect, url_for, \
-    abort, render_template, flash, jsonify
-from flask import request, render_template
-from geventwebsocket.handler import WebSocketHandler
+from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash, jsonify
 
+
+import database_helper
+import sqlite3
+import uuid
 
 app = Flask(__name__)
 
-
 logged_in_users = {}
-sockets = {}
+current_sockets = {}
 
 
 @app.route('/', methods=['GET'])
@@ -177,12 +172,15 @@ def socket_connect():
         ws = request.environ["wsgi.websocket"]
 
         while True:
-            email = ws.receive()
+            token = ws.receive()
 
-            sockets[email] = ws
+            if token in logged_in_users:
+                current_email = logged_in_users[token]
 
-            for email in sockets:
-                sockets[email].send(time.time())
+                current_sockets[current_email] = ws
+
+                for email in current_sockets:
+                    current_sockets[email].send("\nLast login: " + current_email)
 
 
 @run_with_reloader
@@ -194,9 +192,3 @@ def run_server():
 
 if __name__ == '__main__':
     run_server()
-
-
-'''
-if __name__ == '__main__':
-    app.run()
-'''

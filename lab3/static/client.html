@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link href="client.css" type="text/css" rel="stylesheet">
+    <link href="menu.css" type="text/css" rel="stylesheet">
+    <script src="client.js"></script>
+    <script src="serverstub.js"></script>
+    <script>
+        var connection =  new WebSocket("ws://localhost:5000/socket-connect");
+
+        connection.onopen = function () {
+
+            //var d = new Date().getSeconds();
+            //connection.send('Ping: ' + d); // Send the message 'Ping' to the server
+            //connection.send(localStorage.getItem("token"));
+
+        };
+        // Log errors
+        connection.onerror = function (error) {
+            console.log('WebSocket Error ' + error);
+        };
+        // Log messages from the server
+        connection.onmessage = function (e) {
+            console.log('Server: ' + e.data);
+            document.getElementById("main").innerHTML += e.data;
+        };
+        connection.onclose = function () {
+            console.log('WebSocket Closed ');
+        };
+
+    </script>
+
+    <!-- -------------- Welcome view --------------------- -->
+    <script type=”text/view” id="welcomeView">
+<div id="main">
+    <div id="logo-slogan"><img src="wimage.png"></div>
+
+    <div id="login">
+        <form name="signInForm" onsubmit="signIn(); return false;">
+            <br>
+            <label>Email</label><input type="text" name="email"><br>
+            <label>Password</label><input type="password" name="password"><br>
+            <input type="submit" value="Login">
+        </form>
+    </div>
+
+    <div id="signup">
+        <h2>Sign up</h2>
+        <form name="signUpForm" onsubmit="signUp(); return false;">
+            <br>
+            Email<input name="email" type="email"required><br>
+            Password<input type="password" name="password1" required><br>
+            Repeat password<input type="password"  name="password2" required><br>
+            First Name<input type="text" name="firstname" required><br>
+            Family Name<input type="text" name="familyname" required><br>
+            Gender
+            <select name="gender">
+                <option>Male</option>
+                <option>Female</option>
+            </select><br>
+            City<input type="text" name="city" required><br>
+            Country<input type="text" name="country" required><br>
+            <input type="submit" value="Sign up">
+        </form>
+    </div>
+</div>
+</script>
+
+
+    <!-- -------------- Profile view --------------------- -->
+    <script type=”text/view” id="profileView">
+
+    <div id="main">
+
+        <div id="profileDiv">
+
+            <ul id="menu">
+                <li onclick="displayTab('home')">Home</li>
+                <li onclick="displayTab('browse')">Browse</li>
+                <li onclick="displayTab('account')">Account</li>
+                <li onclick="signOut()">Log out</li>
+            </ul>
+
+        <!-- --- home ---- -->
+        <div id="home">
+            <h2>User Info</h2>
+            <div id="userInfo"></div>
+            <hr>
+            <div id="wall">
+                <h2>Wall</h2>
+                <form name="wallForm">
+                    <input type="text" name="message">
+                </form>
+                <button id="sendButton" onclick="sendMessage(this.parentNode.className)">Send</button>
+                <button id="updateButton" onclick="updateWall(this.parentNode.className)">Update</button>
+            <div id="messages"></div>
+        </div>
+        </div>
+
+        <!-- --- browse ---- -->
+        <div id="browse">
+        <h2>Browse</h2>
+            <form name="browseForm" method="post">
+                    <input type="text" name="userEmail">
+            </form>
+            <button onclick="browseUser()">Browse</button>
+        </div>
+
+        <!-- --- account ---- -->
+        <div id="account">
+            <h2>Change password</h2>
+            <form name="changePasswordForm" method="post">
+                Old Password<input type="password" name="oldPassword" required><br>
+                New password<input type="password"  name="newPassword" required><br>
+            </form>
+            <button onclick="changePassword()">Browse</button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+</script>
+
+
+</head>
+<body>
+<div id="content"></div>
+
+</body>
+</html>
