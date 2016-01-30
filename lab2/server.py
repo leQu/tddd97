@@ -4,35 +4,9 @@ import database_helper
 from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash, jsonify
 
-# from contextlib import closing
-
-# configuration
-'''
-DATABASE = '/tmp/flaskr.db'
-DEBUG = True
-SECRET_KEY = 'development key'
-USERNAME = 'admin'
-PASSWORD = 'default'
-'''
-# create our little application :)
 app = Flask(__name__)
-app.config.from_object(__name__)
-
-app.config.from_envvar('FLASKR_SETTINGS', silent=True)
 
 logged_in_users = {}
-
-'''
-def connect_db():
-    return sqlite3.connect(app.config['DATABASE'])
-
-
-def init_db():
-    with closing(connect_db()) as db:
-        with app.open_resource('schema.sql', mode='r') as f:
-            db.cursor().executescript(f.read())
-        db.commit()
-'''
 
 
 @app.route('/', methods=['GET'])
@@ -157,6 +131,14 @@ def sign_out():
         return jsonify({"success": False, "message": "Already sign out."})
 
 
+@app.route('/is-logged-in/<token>', methods=['GET'])
+def is_logged_in(token):
+    if token in logged_in_users:
+        return jsonify({"success": True, "message": True})
+    else:
+        return jsonify({"success": True, "message": False})
+
+
 @app.route('/logged-in-users', methods=['GET'])
 def show_logged_in_users():
     return str(logged_in_users)
@@ -180,8 +162,6 @@ def show_users():
 @app.route('/messages', methods=['GET'])
 def show_messages():
     return jsonify({"data": database_helper.get_all_messages()})
-
-
 
 
 if __name__ == '__main__':

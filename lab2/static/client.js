@@ -1,11 +1,21 @@
+
+// Displays profile view if:
+// 1. Client has a token
+// 2. The token is active on server
 window.onload = function(){
     var token = localStorage.getItem("token");
-    if (token === 'undefined' || token === null ){
-        displayView("welcomeView");
-        addPasswordListeners();
+    if (token != 'undefined' && token != null ){
+        sendGETrequest("/is-logged-in/" + token, function (response){
+            console.log(response);
+            if (response.message) {
+                displayView("profileView");
+            }
+            else displayView("welcomeView");
+        });
     }
-    else displayView("profileView");
-
+    else{
+        displayView("welcomeView");
+    }
 }
 
 function displayView(viewId){
@@ -14,6 +24,10 @@ function displayView(viewId){
 
     if(viewId === "profileView"){
         displayTab("home");
+    }
+
+    if(viewId === "welcomeView"){
+        addPasswordListeners();
     }
 }
 
@@ -85,10 +99,10 @@ function signIn(){
     var postData = "username="+username+"&password="+password;
     sendPOSTrequest("/sign-in", postData, function(response){
         if (response.success){
-        localStorage.setItem("token", response.data);
-        displayView("profileView");
-    }
-    else document.getElementById("login-status").innerHTML = response.message;
+            localStorage.setItem("token", response.data);
+            displayView("profileView");
+        }
+        else document.getElementById("login-status").innerHTML = response.message;
 
     });
 }
@@ -167,9 +181,9 @@ function sign_up() {
     postData += "country="+dataObject.country;
 
     sendPOSTrequest("/add-user", postData, function(response){
-         if (response.success) document.getElementsByName("signUpForm")[0].reset();
+        if (response.success) document.getElementsByName("signUpForm")[0].reset();
 
-         document.getElementById("status").innerHTML = response.message;
+        document.getElementById("status").innerHTML = response.message;
     });
 }
 
