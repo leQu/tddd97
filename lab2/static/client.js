@@ -1,9 +1,8 @@
 window.onload = function(){
-    displayView("welcomeView");
-
     var token = localStorage.getItem("token");
     if (token === 'undefined' || token === null ){
         displayView("welcomeView");
+        addPasswordListeners();
     }
     else displayView("profileView");
 
@@ -60,8 +59,7 @@ function sendMessage(toEmail){
     var token = localStorage.getItem("token");
     var postData = "message=" + message + "&token=" + token + "&email=" + toEmail;
     sendPOSTrequest("/add-message", postData, function(response){
-        if(response.success) updateWall(toEmail);
-        else alert(response.message);
+        updateWall(toEmail);
     });
 }
 
@@ -87,10 +85,11 @@ function signIn(){
     var postData = "username="+username+"&password="+password;
     sendPOSTrequest("/sign-in", postData, function(response){
         if (response.success){
-            localStorage.setItem("token", response.data);
-            displayView("profileView");
-        }
-        else alert(response.message);
+        localStorage.setItem("token", response.data);
+        displayView("profileView");
+    }
+    else document.getElementById("login-status").innerHTML = response.message;
+
     });
 }
 
@@ -98,9 +97,6 @@ function signOut(){
     var postData = "token="+localStorage.getItem("token");
     sendPOSTrequest("/sign-out",postData,function(response){
         localStorage.removeItem("token");
-        if (!response.success){
-            alert(response.message);
-        }
         displayView("welcomeView");
     });
 }
@@ -111,7 +107,7 @@ function changePassword(){
     var token = localStorage.getItem("token");
     var postData = "token=" + token + "&old_password=" + oldPassword + "&new_password=" + newPassword;
     sendPOSTrequest("/change-password",postData, function(response){
-        alert(response.message);
+        document.getElementById("password-message").innerHTML = response.message;
     });
 }
 
@@ -159,8 +155,7 @@ function getOptionsSelectedValue(optionName) {
     return element.options[element.selectedIndex].text;
 }
 
-function signUp() {
-    if (!isSignUpFormValid()) return false;
+function sign_up() {
     // Create data object
     var dataObject = signUpFormToDataObject();
     var postData = "email="+dataObject.email+"&";
@@ -172,7 +167,9 @@ function signUp() {
     postData += "country="+dataObject.country;
 
     sendPOSTrequest("/add-user", postData, function(response){
-        alert(response.message);
+         if (response.success) document.getElementsByName("signUpForm")[0].reset();
+
+         document.getElementById("status").innerHTML = response.message;
     });
 }
 
@@ -196,19 +193,26 @@ function getOptionsSelectedValue(optionName) {
     return element.options[element.selectedIndex].text;
 }
 
-function isSignUpFormValid() {
-    // Passwords must be equal
-    var password1 = document.forms["signUpForm"]["password1"].value;
-    var password2 = document.forms["signUpForm"]["password2"].value;
-    if (password1 != password2) {
-        alert("Password must be the same");
-        return false;
+function addPasswordListeners(){
+    var p1 = document.forms["signUpForm"]["password1"];
+    var p2 = document.forms["signUpForm"]["password2"];
+
+    p1.addEventListener('change', checkPasswordValidity, false);
+    p2.addEventListener('change', checkPasswordValidity, false);
+}
+
+function checkPasswordValidity(){
+
+    var password1 = document.forms["signUpForm"]["password1"];
+    var password2 = document.forms["signUpForm"]["password2"];
+
+    if (password1.value.length < 8){
+        password2.setCustomValidity("Password must be at least 8 characters.");
     }
-    if (password1.length < 8){
-        alert("Password must be at least 8 characters.");
-        return false;
+    else if (password1.value != password2.value) {
+        password2.setCustomValidity("Passwords don't Match");
     }
-    return true;
+    else password2.setCustomValidity("");
 }
 
 function sendPOSTrequest(url, postData, callback){

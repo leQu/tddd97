@@ -8,23 +8,23 @@
     <script src="serverstub.js"></script>
 
 
-    <!-- -------------- Welcome view --------------------- -->
+    <!---------------- Welcome view ----------------------->
     <script type=”text/view” id="welcomeView">
 <div id="main">
     <div id="logo-slogan"><img src="wimage.png"></div>
 
     <div id="login">
-        <form name="signInForm" onsubmit="signIn(); return false;">
+        <form name="signInForm" method="post" onsubmit="event.preventDefault(); signIn();">
             <br>
             <label>Email</label><input type="text" name="email"><br>
             <label>Password</label><input type="password" name="password"><br>
-            <input type="submit" value="Login">
+            <span id="login-status"></span><input type="submit" value="Login">
         </form>
     </div>
 
-    <div id="signup">
+   <div id="signup">
         <h2>Sign up</h2>
-        <form name="signUpForm" onsubmit="signUp(); return false;">
+        <form name="signUpForm" method="post" onsubmit="event.preventDefault(); sign_up();">
             <br>
             Email<input name="email" type="email"required><br>
             Password<input type="password" name="password1" required><br>
@@ -38,14 +38,14 @@
             </select><br>
             City<input type="text" name="city" required><br>
             Country<input type="text" name="country" required><br>
-            <input type="submit" value="Sign up">
+            <input type="submit" value="Sign up"><br /><span id="status"></span>
         </form>
     </div>
 </div>
 </script>
 
 
-       <!-- -------------- Profile view --------------------- -->
+       <!---------------- Profile view ----------------------->
     <script type=”text/view” id="profileView">
 
     <div id="main">
@@ -59,7 +59,7 @@
                 <li onclick="signOut()">Log out</li>
             </ul>
 
-        <!-- --- home ---- -->
+        <!----- home ------>
         <div id="home">
             <h2>User Info</h2>
             <div id="userInfo"></div>
@@ -75,23 +75,24 @@
         </div>
         </div>
 
-        <!-- --- browse ---- -->
+        <!----- browse ------>
         <div id="browse">
         <h2>Browse</h2>
-            <form name="browseForm" method="post">
+            <form name="browseForm" method="post" onsubmit="event.preventDefault(); browseUser();">
                     <input type="text" name="userEmail">
+                    <input type="submit" value="Browse">
             </form>
-            <button onclick="browseUser()">Browse</button>
         </div>
 
-        <!-- --- account ---- -->
+        <!----- account ------>
         <div id="account">
             <h2>Change password</h2>
-            <form name="changePasswordForm" method="post">
+            <form name="changePasswordForm" method="post" onsubmit="event.preventDefault(); changePassword();">
                 Old Password<input type="password" name="oldPassword" required><br>
                 New password<input type="password"  name="newPassword" required><br>
+                <input type="submit" value="Change password">
             </form>
-            <button onclick="changePassword()">Browse</button>
+                    <div id="password-message"></div>
 
         </div>
 

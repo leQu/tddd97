@@ -24,6 +24,8 @@ function displayTab(tabId, email){
     document.getElementById(tabId).style.display = "block";
 
     if (tabId === "home") {
+        // if email is undefined it is assumed that the logged in user's home page
+        // is supposed to be displayed.
         if (typeof email === 'undefined'){
             var token = localStorage.getItem("token");
             email = serverstub.getUserDataByToken(token).data.email;
@@ -84,10 +86,8 @@ function browseUser(){
 }
 
 function sign_up() {
-    // Create data object
     var dataObject = signUpFormToDataObject();
     var response = serverstub.signUp(dataObject);
-
 
     if (response.success) document.getElementsByName("signUpForm")[0].reset();
     document.getElementById("status").innerHTML = response.message;
@@ -116,7 +116,8 @@ function signOutUser(){
 function changePassword(){
     var newPassword = document.forms["changePasswordForm"]["newPassword"].value;
     var oldPassword = document.forms["changePasswordForm"]["oldPassword"].value;
-    serverstub.changePassword(localStorage.getItem("token"),oldPassword,newPassword);
+    var response = serverstub.changePassword(localStorage.getItem("token"),oldPassword,newPassword);
+    document.getElementById("password-message").innerHTML = response.message;
 }
 
 
