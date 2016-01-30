@@ -1,27 +1,40 @@
+from gevent.pywsgi import WSGIServer
+from werkzeug.serving import run_with_reloader
+from geventwebsocket.handler import WebSocketHandler
+from geventwebsocket import WebSocketServer, WebSocketError
+from flask import Flask, request, session, g, redirect, url_for, \
+    abort, render_template, flash, jsonify
 import uuid
 import sqlite3
 import database_helper
 import time
-from geventwebsocket.handler import WebSocketHandler
-from gevent.pywsgi import WSGIServer
-from werkzeug.serving import run_with_reloader
-from geventwebsocket.handler import WebSocketHandler
-from flask import Flask, request, session, g, redirect, url_for, \
-    abort, render_template, flash, jsonify
-from flask import request, render_template
-from geventwebsocket.handler import WebSocketHandler
-
 
 app = Flask(__name__)
 
-
 logged_in_users = {}
-sockets = {}
+current_sockets = {}
 
 
-@app.route('/', methods=['GET'])
-def start():
+@app.route('/')
+def index():
     return redirect('static/client.html')
+
+
+@app.route('/socket-connect')
+def socket_connect():
+    if request.environ.get("wsgi.websocket"):
+        ws = request.environ["wsgi.websocket"]
+        while True:
+            try:
+                cur_email = ws.receive()
+                ws.send(cur_email)
+
+                if cur_email in current_sockets:
+                    current_sockets[cur_email].send("logout")
+
+                current_sockets[cur_email] = ws
+            except WebSocketError:
+                break
 
 
 @app.route('/test', methods=['GET'])
@@ -171,20 +184,6 @@ def show_messages():
     return jsonify({"data": database_helper.get_all_messages()})
 
 
-@app.route('/socket-connect')
-def socket_connect():
-    if request.environ.get("wsgi.websocket"):
-        ws = request.environ["wsgi.websocket"]
-
-        while True:
-            email = ws.receive()
-
-            sockets[email] = ws
-
-            for email in sockets:
-                sockets[email].send(time.time())
-
-
 @run_with_reloader
 def run_server():
     app.debug = True
@@ -192,11 +191,5 @@ def run_server():
     http_server.serve_forever()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run_server()
-
-
-'''
-if __name__ == '__main__':
-    app.run()
-'''

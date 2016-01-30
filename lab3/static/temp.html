@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+
+    <script>
+ window.onload = function(){
+    connectSocket();
+}
+
+function connectSocket() {
+	ws = new WebSocket("ws://localhost:5000/socket-connect");
+
+    ws.onopen = function() {
+		ws.send("hej");
+	};
+
+	ws.onmessage = function(response) {
+        document.getElementById("content").innerHTML += response.data;
+    };
+
+	ws.onclose = function() {
+		console.log("WebSocket closed");
+	};
+
+	ws.onerror = function() {
+		console.log("ERROR!");
+	};
+}
+    </script>
+
+</head>
+
+<body>
+<div id="content"></div>
+</body>
+</html>

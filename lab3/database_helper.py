@@ -1,6 +1,6 @@
 import sqlite3
 from flask import g, jsonify
-from server import app
+#from server import app
 
 
 def connect_to_database():
@@ -14,7 +14,16 @@ def get_db():
     return db
 
 
-def init_db():
+'''
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
+'''
+
+
+def init_db(app):
     with app.app_context():
         db = get_db()
         with app.open_resource('schema.sql', mode='r') as f:
@@ -28,18 +37,6 @@ def query_db(query, args=(), one=False):
                for i, value in enumerate(row)) for row in cur.fetchall()]
     cur.close()
     return (rv[0] if rv else None) if one else rv
-
-
-'''
-
-def query_db(query, args=(), one=False):
-    cur = connect_to_database().cursor()
-    cur.execute(query, args)
-    r = [dict((cur.description[i][0], value) \
-              for i, value in enumerate(row)) for row in cur.fetchall()]
-    cur.connection.close()
-    return (r[0] if r else None) if one else r
-'''
 
 
 def temp():
@@ -79,10 +76,9 @@ def update_password(email, password):
 
 
 def add_user(email, password, firstname, familyname, gender, city, country):
-
-        query_db('insert into users values (?, ?, ?, ?, ?, ?, ?)',
-                 [email, password, firstname, familyname, gender, city, country])
-        get_db().commit()
+    query_db('insert into users values (?, ?, ?, ?, ?, ?, ?)',
+             [email, password, firstname, familyname, gender, city, country])
+    get_db().commit()
 
 
 def add_message(message, from_user, to_user):
