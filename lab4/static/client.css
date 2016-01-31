@@ -62,3 +62,11 @@ h2 {
 span {
     font-size: 0.9em;
 }
+
+#chart {
+    margin:20px;
+}
+
+#profileDiv {
+    padding: 15px;
+}

@@ -6,7 +6,8 @@ create table users (
   familyname text,
   gender text,
   city text,
-  country text
+  country text,
+  page_visits INTEGER
 );
 
 drop table if exists messages;
@@ -15,6 +16,6 @@ create table messages (
   content TEXT NOT NULL ,
   toUser INTEGER NOT NULL ,
   fromUser INTEGER NOT NULL ,
-  FOREIGN KEY(toUser) REFERENCES users(id),
-  FOREIGN KEY(fromUser) REFERENCES users(id)
+  FOREIGN KEY(toUser) REFERENCES users(email),
+  FOREIGN KEY(fromUser) REFERENCES users(email)
 );

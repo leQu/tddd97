@@ -7,7 +7,7 @@ from flask import Flask, request, session, g, redirect, url_for, \
 import uuid
 import sqlite3
 import database_helper
-import time
+import json
 
 app = Flask(__name__)
 
@@ -26,26 +26,30 @@ def socket_connect():
         ws = request.environ["wsgi.websocket"]
         while True:
             try:
-                cur_email = ws.receive()
-                ws.send(cur_email)
+                message = ws.receive()
+                message = json.loads(message)
 
-                if cur_email in current_sockets:
-                    current_sockets[cur_email].send("logout")
+                # when login, the socket + email is saved
+                if "email" == message["type"]:
+                    email = message["data"]
+                    if email in current_sockets:
+                        data = {'type': 'logout'}
+                        current_sockets[email].send(json.dumps(data))
+                    current_sockets[email] = ws
 
-                current_sockets[cur_email] = ws
+                # when stats update is requested
+                elif "stats" == message["type"]:
+                    email = logged_in_users.get(message["token"])
+                    data = {
+                        'type': 'stats',
+                        'messages': len(database_helper.get_user_messages(email)),
+                        'users': len(logged_in_users),
+                        'pageviews': database_helper.get_user_page_views(email)
+                    }
+                    ws.send(json.dumps(data))
+
             except WebSocketError:
                 break
-
-
-@app.route('/stats-connect')
-def stats_connect():
-    if request.environ.get("wsgi.websocket"):
-        ws = request.environ["wsgi.websocket"]
-        while True:
-                time.sleep(1)
-                messages = database_helper.get_all_messages()
-                ws.send(jsonify({"messages": messages}))
-
 
 
 @app.route('/test', methods=['GET'])
@@ -89,6 +93,20 @@ def get_user_data_by_email(token, email):
         return jsonify({"success": False, "message": "Email doesn't exists."})
     else:
         return jsonify({"success": True, "message": "Email exists.", "data": data})
+
+
+@app.route('/increase-page-views', methods=['POST'])
+def increase_page_views():
+    email = request.form['email']
+    token = request.form['token']
+    if token in logged_in_users:
+        try:
+            database_helper.increase_page_visits(email)
+            return jsonify({"success": True, "message": "Visits increased"})
+        except sqlite3.Error:
+            return jsonify({"success": False, "message": "Could not increase visits"})
+    else:
+        return jsonify({"success": False, "message": "You must login to access this data."})
 
 
 @app.route('/get-user-messages-by-email/<token>/<email>', methods=['GET'])
@@ -164,6 +182,8 @@ def sign_in():
 def sign_out():
     token = request.form['token']
     if token in logged_in_users:
+        email = logged_in_users[token]
+        del current_sockets[email]
         del logged_in_users[token]
         return jsonify({"success": True, "message": "Successfully signed out."})
     else:
@@ -211,4 +231,5 @@ def run_server():
 
 
 if __name__ == "__main__":
+    # init_db(app)
     run_server()

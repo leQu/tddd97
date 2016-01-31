@@ -1,6 +1,5 @@
 import sqlite3
 from flask import g, jsonify
-#from server import app
 
 
 def connect_to_database():
@@ -12,15 +11,6 @@ def get_db():
     if db is None:
         db = g._database = connect_to_database()
     return db
-
-
-'''
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
-'''
 
 
 def init_db(app):
@@ -62,6 +52,12 @@ def get_user_data(email):
     return user_data[0]
 
 
+def get_user_page_views(email):
+    user_data = query_db('select page_visits from users where email=? ',
+                         [email])
+    return user_data[0]['page_visits']
+
+
 def get_user_messages(email):
     messages = query_db('select id, content, toUser, fromUser from messages where toUser=? order by id desc',
                         [email])
@@ -76,14 +72,20 @@ def update_password(email, password):
 
 
 def add_user(email, password, firstname, familyname, gender, city, country):
-    query_db('insert into users values (?, ?, ?, ?, ?, ?, ?)',
-             [email, password, firstname, familyname, gender, city, country])
+    query_db('insert into users values (?, ?, ?, ?, ?, ?, ?,?)',
+             [email, password, firstname, familyname, gender, city, country, 0])
     get_db().commit()
 
 
 def add_message(message, from_user, to_user):
     response = query_db('insert into messages(content, toUser, fromUser) values (?, ?, ?)',
                         [message, to_user, from_user])
+    get_db().commit()
+    return response
+
+
+def increase_page_visits(email):
+    response = query_db('UPDATE users SET page_visits = page_visits + 1 WHERE email=?', [email])
     get_db().commit()
     return response
 

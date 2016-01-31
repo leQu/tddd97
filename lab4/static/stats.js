@@ -2,14 +2,27 @@
 // total number of messages
 //
 
-var messages = 0;
+var messages_count = 0;
+var users_count = 0;
+var page_views_count = 0;
 
-$(document).ready(function(){
 
-    connectStats();
+function updateData(oldData){
+    var dataSetA = oldData["datasets"][0]["data"];
+    dataSetA[0] = users_count;
+    dataSetA[1] = messages_count;
+    dataSetA[2] = page_views_count;
+}
+
+function loadChart() {
+
+    var options = {
+        animation : false,
+        scaleOverride : false
+    };
 
     var data = {
-        labels: ["Users online", "Total messages", "???"],
+        labels: ["Users online", "My received messages", "My homepage views"],
         datasets: [
             {
                 label: "My Second dataset",
@@ -22,51 +35,24 @@ $(document).ready(function(){
         ]
     };
 
-    var updateData = function(oldData){
-        var dataSetA = oldData["datasets"][0]["data"];
-         dataSetA[0] = messages;
-    };
-
-    var options = {
-        animation : false,
-        scaleOverride : false,
-        scaleSteps : 5,
-        scaleStepWidth : 2,
-        scaleStartValue : 0
-    }
-
-
     var ctx = document.getElementById("chart").getContext("2d");
-    var myNewChart = new Chart(ctx);
+    var chart = new Chart(ctx);
+
 
     setInterval(function(){
-            updateData(data);
-            myNewChart.Bar(data, options)
-            ;}, 1000
+        requestStats();
+        updateData(data);
+        chart.Bar(data, options)
+        ;}, 1000
     );
-});
 
+}
 
-function connectStats() {
-    var ws = new WebSocket("ws://localhost:5000/stats-connect");
-
-    ws.onopen = function() {
-        //ws.send(email);
-    };
-
-    ws.onmessage = function(response) {
-        console.log(response.data.size);
-
-        messages = response.data.size;
-    };
-
-    ws.onclose = function() {
-        console.log("WebSocket closed");
-    };
-
-    ws.onerror = function() {
-        console.log("ERROR!");
-    };
-}/**
- * Created by henha972 on 30/01/16.
- */
+function requestStats(){
+    var data = {};
+    data["type"] = "stats";
+    data["token"] = localStorage.getItem("token");
+    console.log(data);
+    if (typeof ws !== 'undefined')
+        ws.send(JSON.stringify(data));
+}

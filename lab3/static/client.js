@@ -31,7 +31,7 @@ function displayTab(tabId, email){
     if (tabId === "home") {
         // if email is undefined it is assumed that the logged in user's home page
         // is supposed to be displayed.
-        if (typeof email === 'undefined'){
+        if (typeof email === 'undefined' || email === null){
             var token = localStorage.getItem("token");
             sendGETrequest("/get-user-data-by-token/" + token, function (response){
                 if(response.success) updateHomeTab(response.data.email)

@@ -1,10 +1,13 @@
+
+
 window.onload = function(){
-  var token = localStorage.getItem("token");
+    var token = localStorage.getItem("token");
     if (token != 'undefined' && token != null ){
         sendGETrequest("/is-logged-in/" + token, function (response){
             console.log(response);
             if (response.message) {
                 displayView("profileView");
+                loadChart();
             }
             else displayView("welcomeView");
         });
@@ -48,8 +51,20 @@ function updateHomeTab(email){
 
     updateUserInfo(email);
     updateWall(email);
+    increasePageViews(email);
+
 }
 
+function increasePageViews(email){
+    var token = localStorage.getItem("token");
+
+    var postData = "&token=" + token + "&email=" + email;
+
+    sendPOSTrequest("/increase-page-views", postData, function(response){
+        console.log(response.message);
+    });
+
+}
 
 function getMessagesString(messages){
     var string = "";
@@ -93,6 +108,7 @@ function signIn(){
             connectSocket(email);
             localStorage.setItem("token", response.data);
             displayView("profileView");
+            loadChart();
         }
         else document.getElementById("login-status").innerHTML = response.message;
 
@@ -102,6 +118,7 @@ function signIn(){
 function signOut(){
     var postData = "token="+localStorage.getItem("token");
     sendPOSTrequest("/sign-out",postData,function(response){
+        delete ws;
         localStorage.removeItem("token");
         displayView("welcomeView");
     });
@@ -247,18 +264,28 @@ function sendGETrequest(url, callback) {
 }
 
 
+var ws;
 function connectSocket(email) {
-    var ws = new WebSocket("ws://localhost:5000/socket-connect");
+    ws = new WebSocket("ws://localhost:5000/socket-connect");
 
     ws.onopen = function() {
-        ws.send(email);
+        var data = {};
+        data["type"] = "email";
+        data["data"] = email;
+        ws.send(JSON.stringify(data));
     };
 
     ws.onmessage = function(response) {
-        console.log(response.data);
-        if (response.data == "logout") {
-            signOut();
-        };
+        var response = JSON.parse(response.data);
+
+        console.log(response);
+
+        if (response.type == "logout") signOut();
+        else if (response.type == "stats") {
+            messages_count = response.messages;
+            users_count = response.users;
+            page_views_count = response.pageviews;
+        }
     };
 
     ws.onclose = function() {

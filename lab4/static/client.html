@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <link href="client.css" type="text/css" rel="stylesheet">
     <link href="menu.css" type="text/css" rel="stylesheet">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/1.0.2/Chart.min.js"></script>
     <script src="client.js"></script>
     <script src="serverstub.js"></script>
+    <script src="stats.js"></script>
 
 
     <!---------------- Welcome view ----------------------->
@@ -45,7 +48,7 @@
 </script>
 
 
-       <!---------------- Profile view ----------------------->
+    <!---------------- Profile view ----------------------->
     <script type=”text/view” id="profileView">
 
     <div id="main">
@@ -61,6 +64,11 @@
 
         <!----- home ------>
         <div id="home">
+            <h2>Stats</h2>
+
+            <canvas id="chart" width="400" height="300"></canvas>
+
+
             <h2>User Info</h2>
             <div id="userInfo"></div>
             <hr>

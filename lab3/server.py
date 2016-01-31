@@ -7,7 +7,6 @@ from flask import Flask, request, session, g, redirect, url_for, \
 import uuid
 import sqlite3
 import database_helper
-import time
 
 app = Flask(__name__)
 
@@ -27,11 +26,8 @@ def socket_connect():
         while True:
             try:
                 cur_email = ws.receive()
-                ws.send(cur_email)
-
                 if cur_email in current_sockets:
                     current_sockets[cur_email].send("logout")
-
                 current_sockets[cur_email] = ws
             except WebSocketError:
                 break
@@ -153,6 +149,8 @@ def sign_in():
 def sign_out():
     token = request.form['token']
     if token in logged_in_users:
+        email = logged_in_users[token]
+        del current_sockets[email]
         del logged_in_users[token]
         return jsonify({"success": True, "message": "Successfully signed out."})
     else:
